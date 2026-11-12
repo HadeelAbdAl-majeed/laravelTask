@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Projects;
+use App\Models\Developer;
 
 class PortfolioController extends Controller
 {
@@ -15,6 +18,31 @@ class PortfolioController extends Controller
         return view('portfolio.home', compact('developer'));
     }
 
+    public function create()
+    {
+        $developers = Developer::all();
+        return view('portfolio.create',['developers'=>$developers]);
+    }
+
+    public function store()
+    {
+
+        $title = Request()->title;
+        $description = Request()->description;
+        $status = Request()->status;
+        $developer_id=Request()->developer_id;
+        //  @dd($status);
+        Projects::create([
+            'title'=>$title,
+            'description'=>$description,
+            'status'=>$status,
+            'developer_id'=>$developer_id,
+        ]);
+
+         return to_route('projects');
+        // return 'store data';
+    }
+
     public function projects()
     {
         // Mock data replacing a database query
@@ -22,8 +50,17 @@ class PortfolioController extends Controller
             ['title' => 'Task Management System', 'description' => 'A daily task tracker app', 'status' => 'Completed'],
             ['title' => 'E-Commerce Store', 'description' => 'Full online shopping platform', 'status' => 'In Progress'],
         ];
-        return view('portfolio.projects', compact('projects'));
+
+        $projectAll=Projects::all();
+
+        return view('portfolio.projects',['projects'=> $projectAll]);
     }
 
-   
+    public function destroy($projectId){
+
+      $deleteProject=Projects::find($projectId);
+      $deleteProject->delete();
+      
+      return to_route('projects');
+    }
 }
